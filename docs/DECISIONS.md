@@ -10,7 +10,7 @@ entry that supersedes it, so the history of our thinking stays readable.
 ## D-001 — Target framework: net10.0
 **Date:** Phase 0
 **Decision:** Target `net10.0`, C# 14.
-**Reason:** The user has the .NET 10 SDK installed, and the Avalonia 11
+**Reason:** The user has the .NET 10 SDK installed, and the Avalonia 12.1.1
 MVVM template already requires it. .NET 10 is LTS.
 **Rejected:** `net8.0` — only useful for shipping to machines with an older
 runtime, which does not apply to a personal single-machine project.

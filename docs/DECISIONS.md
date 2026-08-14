@@ -226,3 +226,33 @@ makes the second insert fail at the database level.
 **Decision:** No attempt-history table in v1. `AttemptCount` and `LastError`
 on `Video` cover S-17.
 **Reason:** S-25 (raw log viewer) is v2. Adding the table later is a migration.
+
+---
+
+## D-017 — Partial-property syntax for [ObservableProperty]
+**Date:** Step 2
+**Decision:** Use the partial-property form:
+`[ObservableProperty] public partial string Greeting { get; set; }`
+rather than the older private-field form (`private string _greeting;`).
+**Reason:** Requires CommunityToolkit.Mvvm 8.4+ and C# 13, both available on
+net10.0, and the Avalonia 12 template already generates this form. Removes the
+`_field` → `Property` naming translation, which was the most common source of
+confusion with the generator. The property is visible in the source file rather
+than only in generated code.
+**Consequence:** The class must still be `partial`. Property initialisers are
+allowed (`{ get; set; } = "..."`), contrary to an early assumption.
+
+---
+
+## D-018 — Compiled bindings
+**Date:** Step 2
+**Decision:** Rely on Avalonia 12's default, which compiles `{Binding}`
+expressions when `x:DataType` is declared on the view. No csproj setting added.
+**Verified:** A deliberate typo (`{Binding Greetng}`) produced build error
+AVLN2000 with file, line, column, and the type checked against — not a silent
+runtime failure as it would be in WPF.
+**Reason:** Binding typos become build errors, and rename refactoring updates
+XAML. This is one of Avalonia's clearest improvements over WPF.
+**Consequence:** **Every view must declare `x:DataType`.** Without it, bindings
+fall back to reflection and typos become silent again. The safety comes from
+`x:DataType`, not from the framework version.

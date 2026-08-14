@@ -14,3 +14,15 @@
 - RSS answers "did anything change?". `/videos` is the authoritative list.
 - Collections bound to the UI must only be modified on the UI thread.
   Use Dispatcher.UIThread.Post, or IProgress<T> created on the UI thread.
+- 
+## Indexes
+- A composite index (A, B) stores rows grouped by A, sorted by B within
+  each group. It serves "filter on A, sort by B" with no sort step.
+- Only usable left-to-right: (A, B) helps queries starting with A, never
+  ones starting with B.
+- Indexes cost time on insert and space on disk. Add them for queries you
+  actually run.
+
+- A C# property initialiser (= true) is not a database default. EF writes
+  every column on insert, so DB defaults rarely fire. Use HasDefaultValue()
+  only if rows can be created outside your C# code.

@@ -1,18 +1,38 @@
 ﻿using System;
 using Avalonia;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace Rasid.App;
 
 internal sealed class Program
 {
-    // Initialization code. Don't use any Avalonia, third-party APIs or any
-    // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
-    // yet and stuff might break.
-    [STAThread]
-    public static void Main(string[] args) => BuildAvaloniaApp()
-        .StartWithClassicDesktopLifetime(args);
+    public static IHost Host { get; private set; } = null!;
 
-    // Avalonia configuration, don't remove; also used by visual designer.
+    [STAThread]
+    public static void Main(string[] args)
+    {
+        Host = AppHost.Build();
+
+        try
+        {
+            Log.Information("Rasid starting. Data folder: {Folder}", AppPaths.DataFolder);
+
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        }
+        catch (Exception e)
+        {
+            Log.Fatal(e, "Rasid Crashed");
+            throw;
+        }
+        finally
+        {
+            Log.Information("Rasid shutting down");
+            Log.CloseAndFlush();
+            Host.Dispose();
+        }
+    }
+
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()

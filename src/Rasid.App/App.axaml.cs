@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Microsoft.Extensions.DependencyInjection;
 using Rasid.App.ViewModels;
 using Rasid.App.Views;
 
@@ -19,7 +20,7 @@ public class App : Application
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainViewModel()
+                DataContext = Program.Host.Services.GetRequiredService<MainViewModel>()
             };
         }
 

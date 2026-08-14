@@ -26,3 +26,37 @@
 - A C# property initialiser (= true) is not a database default. EF writes
   every column on insert, so DB defaults rarely fire. Use HasDefaultValue()
   only if rows can be created outside your C# code.
+
+## EF Core
+- DbContext is NOT thread-safe. Inject IDbContextFactory<T>, create one per
+  unit of work, dispose immediately with `await using`.
+- Entities are plain classes. Attributes ([Key], [MaxLength]) handle
+  per-property rules; the fluent API handles relationships and indexes.
+- With <Nullable>enable</Nullable>, a non-nullable string is already
+  NOT NULL. [Required] is unnecessary.
+- A navigation property (Channel?) is null until you .Include() it.
+  The FK (ChannelId) is what's always there.
+- IDesignTimeDbContextFactory exists only so `dotnet ef` can build a
+  context outside the app. The app uses DI instead.
+- A C# initialiser (= true) is not a database default.
+- Composite index (A, B): grouped by A, sorted by B within each group.
+  Only usable left-to-right.
+
+- DI registration only records a recipe. Nothing is created until
+  something asks for it.
+- A static property with an initialiser runs the first time anything
+  touches it — that is when our AppData folder actually gets created.
+- The message loop runs on the same thread as Main. Heavy work there
+  freezes the window. This is why DispatcherTimer was rejected (D-011).
+- ## Hosting and DI
+ 
+- Registration only records a recipe. Nothing exists until something asks.
+- Lifetimes: singleton (whole app), transient (new each time), scoped
+  (avoid in desktop — there is no request boundary).
+- A singleton must never depend on something shorter-lived — it captures
+  one instance and holds it forever ("captive dependency").
+- GetRequiredService<T> throws a clear error; GetService<T> returns null
+  and gives you a blank window with no explanation.
+- Log.CloseAndFlush() in a finally block, or the last lines never reach disk.
+- Structured logging: Log.Information("path {Folder}", value) — not string
+  interpolation. That is what makes the field searchable.

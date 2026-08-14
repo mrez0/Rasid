@@ -256,3 +256,35 @@ XAML. This is one of Avalonia's clearest improvements over WPF.
 **Consequence:** **Every view must declare `x:DataType`.** Without it, bindings
 fall back to reflection and typos become silent again. The safety comes from
 `x:DataType`, not from the framework version.
+
+## D-019 — Times stored in UTC, converted for display only
+**Date:** Step 3
+**Decision:** All DateTime fields store UTC. Always use `DateTime.UtcNow`,
+never `DateTime.Now`. Conversion to local time happens in ViewModels via
+`ToLocalTime()`, never in the model or services.
+**Reason:** UTC has no DST ambiguity. Cairo is +2 in winter and +3 in summer;
+the OS knows the current rule, so we never hardcode an offset. This also keeps
+the Model-holds-facts / ViewModel-holds-presentation split intact.
+**Rejected:** DateTimeOffset — more correct in general, but every value would
+carry +00:00, so it adds ceremony without adding information.
+**Risk:** SQLite stores dates as TEXT and may lose DateTimeKind on read. If
+`ToLocalTime()` appears to do nothing, that is the cause — fix with a
+HasConversion that stamps DateTimeKind.Utc on read.
+
+## D-020 — Output layout targets Jellyfin
+**Date:** Step 4
+**Decision:** Downloads are organised for a Jellyfin media server, which the
+user runs at home to watch the library from any device.
+**Consequences for step 11 (download service):**
+- Folder per channel remains correct (S-11); Jellyfin reads each channel
+  folder as a "show".
+- Filenames include the upload date so Jellyfin sorts chronologically:
+  `{channel} - {YYYY-MM-DD} - {title}.{ext}`
+- Pass `--write-info-json` so Jellyfin's YouTube metadata plugin can read
+  real titles, descriptions, and upload dates instead of guessing.
+- Pass `--write-thumbnail` so videos show real thumbnails.
+- Sanitised filenames matter more than before: Jellyfin scans the folder,
+  so a broken name means a broken library entry.
+  **Cost:** Two extra yt-dlp flags and a filename template. Nothing structural.
+  **Note:** Watch-progress tracking is Jellyfin's job, not ours — this is why
+  watched/unwatched stayed out of scope.

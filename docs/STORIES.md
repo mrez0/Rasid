@@ -71,12 +71,10 @@ so that I can stop something I do not want.
 
 ### Files on disk
 
-**S-11 — Folder per channel**
-As a user, I want each channel's videos in its own folder,
-so that my library stays organised.
-- I choose the root download folder
-- Folder name is derived safely from the channel name
-
+**S-11 — Folder per channel** (updated)
+- Layout must be Jellyfin-compatible (D-020): date in filename, sidecar
+  .info.json and thumbnail written alongside each video
+- 
 **S-12 — Keep only the newest N**
 As a user, I want the app to delete older downloads so only the newest N
 videos remain per channel, so that my disk does not fill up.

@@ -12,10 +12,10 @@
 
 - [x] **1.** Solution and projects — create Rasid.Core, Rasid.App, Rasid.Tests;
   wire references; first run of the empty Avalonia window.
-- [ ] **2.** MVVM basics — ViewModelBase, CommunityToolkit
+- [x] **2.** MVVM basics — ViewModelBase, CommunityToolkit
   `[ObservableProperty]`, compiled bindings with `x:DataType`, why
   reflection bindings are worse.
-- [ ] **3.** Database — EF Core, `RasidDbContext`, the Channel and Video
+- [x] **3.** Database — EF Core, `RasidDbContext`, the Channel and Video
   entities, first migration, `IDbContextFactory` and why it is mandatory.
 - [ ] **4.** Hosting and DI — `Microsoft.Extensions.Hosting`, wiring Avalonia's
   lifetime to the host, Serilog, first injected service.

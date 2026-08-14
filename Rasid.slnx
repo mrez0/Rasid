@@ -1,7 +1,7 @@
 <Solution>
-  <Folder Name="/src/">
-    <Project Path="src/Rasid.App/Rasid.App.csproj" />
-    <Project Path="src/Rasid.Core/Rasid.Core.csproj" />
-    <Project Path="src/Rasid.Tests/Rasid.Tests.csproj" />
-  </Folder>
+    <Folder Name="/src/">
+        <Project Path="src/Rasid.App/Rasid.App.csproj"/>
+        <Project Path="src/Rasid.Core/Rasid.Core.csproj"/>
+        <Project Path="src/Rasid.Tests/Rasid.Tests.csproj"/>
+    </Folder>
 </Solution>

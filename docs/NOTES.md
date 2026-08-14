@@ -12,3 +12,5 @@
   and would make old videos look new.
 - Treat duration as optional (`double?`). Flat-playlist returns NA for Shorts.
 - RSS answers "did anything change?". `/videos` is the authoritative list.
+- Collections bound to the UI must only be modified on the UI thread.
+  Use Dispatcher.UIThread.Post, or IProgress<T> created on the UI thread.

@@ -206,3 +206,23 @@ platform-specific files in the repo that break within weeks.
 as yt-dlp: yt-dlp downloads video and audio as separate streams and needs
 ffmpeg to merge them. Missing ffmpeg produces a confusing partial failure, so
 we check for both at startup.
+
+## D-014 — Video rows outlive their files
+**Decision:** A `Video` row is never deleted when its file is removed by
+retention. Status becomes `Deleted` and `FilePath` becomes null.
+**Reason:** S-07 (never download twice) and S-12 (delete old files) are only
+compatible if history survives deletion. Otherwise a deleted file looks new on
+the next check and downloads forever.
+**Consequence:** The `Video` table grows without bound — acceptable, since a
+row is tiny and even years of history stays under a few MB.
+
+## D-015 — Dedup enforced by primary key
+**Decision:** The YouTube video ID is the primary key of `Video`.
+**Reason:** With up to 3 parallel downloads, a check-then-insert pattern has a
+race window where two threads both see "not present" and both insert. A PK
+makes the second insert fail at the database level.
+
+## D-016 — DownloadAttempt table deferred
+**Decision:** No attempt-history table in v1. `AttemptCount` and `LastError`
+on `Video` cover S-17.
+**Reason:** S-25 (raw log viewer) is v2. Adding the table later is a migration.

@@ -10,7 +10,7 @@
 
 ## Part 1 — Foundations
 
-- [ ] **1.** Solution and projects — create Rasid.Core, Rasid.App, Rasid.Tests;
+- [x] **1.** Solution and projects — create Rasid.Core, Rasid.App, Rasid.Tests;
   wire references; first run of the empty Avalonia window.
 - [ ] **2.** MVVM basics — ViewModelBase, CommunityToolkit
   `[ObservableProperty]`, compiled bindings with `x:DataType`, why

@@ -26,7 +26,7 @@
             Grid.Row="1"
             Margin="16,0,16,16"
             Spacing="6">
-            <Grid ColumnDefinitions="*, Auto">
+            <Grid ColumnDefinitions="*, Auto, Auto">
                 <TextBox PlaceholderText="Paste a YouTube channel URL" Text="{Binding NewChannelUrl}" />
                 <Button
                     Grid.Column="1"
@@ -34,6 +34,11 @@
                     Command="{Binding AddChannelCommand}"
                     Content="Add"
                     IsEnabled="{Binding !AddChannelCommand.IsRunning}" />
+                <Button
+                    Grid.Column="2"
+                    Margin="8,0,0,0"
+                    Command="{Binding RemoveChannelCommand}"
+                    Content="Remove" />
             </Grid>
 
             <TextBlock

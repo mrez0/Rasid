@@ -25,6 +25,10 @@ One-line rules learned along the way, grouped by topic.
   the ViewModel.
 - Binding works on any public property. `INotifyPropertyChanged` is only
   needed for *changes*, not for the initial read.
+- [RelayCommand(CanExecute = nameof(X))] makes the command gate itself.
+  Bind Command only — do not bind IsEnabled; the command drives the button.
+- Add [NotifyCanExecuteChangedFor(nameof(SomeCommand))] to whatever the
+  CanExecute depends on, or it evaluates once and never updates.
 
 ---
 
@@ -89,6 +93,12 @@ One-line rules learned along the way, grouped by topic.
   every column on insert, so DB defaults rarely fire. Use `HasDefaultValue()`
   only if rows can be created outside your C# code.
 - Enum values are stored as integers, so pin the numbers explicitly.
+- Deleting a parent without .Include on its children lets the database
+  cascade in one statement. With .Include, EF tracks each child and
+  deletes them individually. Do not Include what you do not need.
+
+
+
 
 ---
 
@@ -135,7 +145,11 @@ One-line rules learned along the way, grouped by topic.
 - Use ArgumentList, never a single Arguments string. Each item is escaped
   for you; hand-built strings break on spaces and invite injection.
 - Exit code 0 means success. stderr usually explains any other code.
-- 
+- Anything read before an `await` may have changed by the time it resumes.
+  Capture what you need into a local first.
+
+
+
 ## YouTube data sources
 
 - A channel URL is three playlists. Always target `/videos`, `/shorts`, or

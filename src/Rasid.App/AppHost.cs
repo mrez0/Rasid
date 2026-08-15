@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Rasid.App.Services;
 using Rasid.App.ViewModels;
 using Rasid.Core.Abstractions;
 using Rasid.Core.Data;
@@ -38,6 +39,7 @@ public static class AppHost
 
         builder.Services.AddTransient<MainViewModel>();
         builder.Services.AddSingleton<IChannelResolver, YtDlpChannelResolver>();
+        builder.Services.AddSingleton<IDialogService, DialogService>();
 
         return builder.Build();
     }

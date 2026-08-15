@@ -17,16 +17,19 @@ namespace Rasid.App.ViewModels;
 public partial class MainViewModel(
     IDbContextFactory<RasidDbContext> dbContextFactory,
     IChannelResolver channelResolver,
+    IDialogService dialogService,
     ILogger<MainViewModel> logger)
     : ViewModelBase
 {
     private readonly IDbContextFactory<RasidDbContext> _dbContextFactory = dbContextFactory;
     private readonly IChannelResolver _channelResolver = channelResolver;
+    private readonly IDialogService _dialogService = dialogService;
     private readonly ILogger<MainViewModel> _logger = logger;
 
     public ObservableCollection<ChannelItemViewModel> Channels { get; } = [];
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RemoveChannelCommand))]
     public partial ChannelItemViewModel? SelectedChannel { get; set; }
 
     [ObservableProperty]
@@ -73,6 +76,7 @@ public partial class MainViewModel(
         if (string.IsNullOrWhiteSpace(url))
         {
             StatusMessage = "Paste a channel URL first.";
+            return;
         }
 
         StatusMessage = "Looking up channel...";
@@ -121,7 +125,56 @@ public partial class MainViewModel(
         }
     }
 
-    private string MakeFolderName(string name)
+    [RelayCommand(CanExecute = nameof(CanRemoveChannel))]
+    private async Task RemoveChannelAsync()
+    {
+        ChannelItemViewModel? selected = SelectedChannel;
+
+        if (selected is null)
+        {
+            return;
+        }
+
+        bool confirmed = await _dialogService.ConfirmAsync(
+            "Remove channel",
+            $"Stop watching {selected.Name}?\n\n" +
+            "Its download history will be forgotten. Files already on disk are not deleted.",
+            "Remove"
+        );
+
+        if (!confirmed)
+        {
+            return;
+        }
+
+        try
+        {
+            await using RasidDbContext db = await _dbContextFactory.CreateDbContextAsync();
+            Channel? channel = await db.Channels.FirstOrDefaultAsync(c => c.Id == selected.Id);
+
+            if (channel is not null)
+            {
+                db.Channels.Remove(channel);
+                await db.SaveChangesAsync();
+            }
+
+            Channels.Remove(selected);
+            SelectedChannel = null;
+
+            StatusMessage = $"Removed {selected.Name}.";
+            _logger.LogInformation("Removed channel {Id} ({Name})", selected.Id, selected.Name);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to remove channel {Id}", selected.Id);
+            StatusMessage = "Could not remove that channel. Check the log.";
+        }
+    }
+
+
+    private bool CanRemoveChannel() => SelectedChannel is not null;
+
+    private static string MakeFolderName(string name)
     {
         char[] illegal = Path.GetInvalidFileNameChars();
         string cleaned = new(name.Where(c => !illegal.Contains(c)).ToArray());

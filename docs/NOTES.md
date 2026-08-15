@@ -46,7 +46,13 @@ One-line rules learned along the way, grouped by topic.
 - RowDefinitions="Auto,*" is Avalonia shorthand for a two-row Grid.
 - Design.DataContext cannot work once a ViewModel needs constructor
   arguments — the previewer builds it with `new`.
- 
+- `{Binding !Something}` — inline boolean negation, no converter needed
+  (WPF requires a converter class for this).
+- TextBox has a `Watermark` property for placeholder text.
+- [RelayCommand] on `DoThingAsync` generates `DoThingCommand`, and async
+  commands expose `IsRunning` — bind IsEnabled to `!Command.IsRunning`
+  instead of tracking your own busy flag.
+
 ---
 
 ## Hosting and DI
@@ -123,7 +129,13 @@ One-line rules learned along the way, grouped by topic.
   not awaiting was deliberate.
 - Fire-and-forget swallows exceptions. Only safe when the method catches
   and logs everything itself.---
-
+- When running a child process, start reading stdout AND stderr before
+  awaiting WaitForExit. A full pipe buffer blocks the child forever —
+  a silent deadlock with no error message.
+- Use ArgumentList, never a single Arguments string. Each item is escaped
+  for you; hand-built strings break on spaces and invite injection.
+- Exit code 0 means success. stderr usually explains any other code.
+- 
 ## YouTube data sources
 
 - A channel URL is three playlists. Always target `/videos`, `/shorts`, or
@@ -145,3 +157,8 @@ One-line rules learned along the way, grouped by topic.
   nothing. Design the test so the outcomes differ.
 - When a fact is expensive to nail down, ask first whether the design can stop
   caring about it.
+
+## Cross-platform
+
+- Path.GetInvalidFileNameChars() returns a different set per OS. Use it
+  rather than hardcoding a list of forbidden characters.

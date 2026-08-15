@@ -24,7 +24,7 @@
 
 - [x] **5.** Channel list UI — `ObservableCollection`, `ItemsControl` vs
   `ListBox`, `DataTemplate`, ViewModel-first views. Reads real rows.
-- [ ] **6.** Adding a channel — `IChannelResolver` running yt-dlp, async command
+- [x] **6.** Adding a channel — `IChannelResolver` running yt-dlp, async command
   with a busy state, validation and error display (S-01).
 - [ ] **7.** Removing a channel — confirmation dialogs done the MVVM way,
   cascade delete, the file-safety guard from D-002 (S-03).

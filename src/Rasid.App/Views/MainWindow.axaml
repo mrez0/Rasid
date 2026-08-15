@@ -15,15 +15,35 @@
     mc:Ignorable="d">
 
 
-    <Grid RowDefinitions="Auto, *">
+    <Grid RowDefinitions="Auto, Auto, *">
         <TextBlock
             Grid.Row="0"
             Margin="16"
             FontSize="20"
             Text="Watched Channels" />
 
-        <ListBox
+        <StackPanel
             Grid.Row="1"
+            Margin="16,0,16,16"
+            Spacing="6">
+            <Grid ColumnDefinitions="*, Auto">
+                <TextBox PlaceholderText="Paste a YouTube channel URL" Text="{Binding NewChannelUrl}" />
+                <Button
+                    Grid.Column="1"
+                    Margin="8,0,0,0"
+                    Command="{Binding AddChannelCommand}"
+                    Content="Add"
+                    IsEnabled="{Binding !AddChannelCommand.IsRunning}" />
+            </Grid>
+
+            <TextBlock
+                FontSize="12"
+                Opacity="0.7"
+                Text="{Binding StatusMessage}" />
+        </StackPanel>
+
+        <ListBox
+            Grid.Row="2"
             Margin="16,0,16,16"
             ItemsSource="{Binding Channels}"
             SelectedItem="{Binding SelectedChannel}">

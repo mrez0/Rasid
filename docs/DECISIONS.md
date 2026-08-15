@@ -191,21 +191,20 @@ an `ILogger<T>` by injection.
 
 ---
 
-## D-013 — yt-dlp and ffmpeg: required, not bundled
-**Date:** Phase 0
-**Decision:** The user installs yt-dlp and ffmpeg themselves. The app locates
-them via `IExternalToolLocator`: a configured path first, then PATH, then
-known per-OS install locations. A clear message with the install command for
-the current OS if either is missing (S-18).
-**Reason:** yt-dlp updates roughly weekly because YouTube keeps changing. A
-bundled copy goes stale and silently stops working. Bundling also means a
-separate binary per OS, conflicting with D-003.
-**Rejected:** Shipping the binaries — instant setup, but ~30 MB of
-platform-specific files in the repo that break within weeks.
-**Consequence:** First-run needs a clear setup message. ffmpeg matters as much
-as yt-dlp: yt-dlp downloads video and audio as separate streams and needs
-ffmpeg to merge them. Missing ffmpeg produces a confusing partial failure, so
-we check for both at startup.
+## D-013 (amended) — External tool dependencies: three, not two
+**Amended:** Step 6
+**Verified 2026-08-15:** Without a JavaScript runtime, yt-dlp returns **only
+storyboard images** for a video — no format at any quality. This is a hard
+blocker, not a quality degradation. Installing Deno fixed it; the log line
+`[jsc:deno] Solving JS challenges using deno` confirms it is being used.
+**Decision:** Rasid requires three external tools:
+1. **yt-dlp** — listing and downloading
+2. **ffmpeg** — merging video and audio (separate streams above 360p)
+3. **Deno** — solving YouTube's "n challenge" JavaScript puzzle
+   **Consequence:** `IExternalToolLocator` (step 9) must check all three, and
+   S-18's missing-tool message must name whichever is absent with the correct
+   install command per OS. Windows: `winget install DenoLand.Deno`.
+---
 
 ## D-014 — Video rows outlive their files
 **Decision:** A `Video` row is never deleted when its file is removed by
@@ -285,9 +284,11 @@ user runs at home to watch the library from any device.
 - Pass `--write-thumbnail` so videos show real thumbnails.
 - Sanitised filenames matter more than before: Jellyfin scans the folder,
   so a broken name means a broken library entry.
-  **Cost:** Two extra yt-dlp flags and a filename template. Nothing structural.
-  **Note:** Watch-progress tracking is Jellyfin's job, not ours — this is why
-  watched/unwatched stayed out of scope.
+
+**Cost:** Two extra yt-dlp flags and a filename template. Nothing structural.
+
+**Note:** Watch-progress tracking is Jellyfin's job, not ours — this is why
+watched/unwatched stayed out of scope.
 
 ## D-021 — Migrations applied at startup, blocking
 **Date:** Step 5
@@ -303,3 +304,37 @@ fire-and-forget so the window appears immediately.
 **Reason:** EF logs every SQL statement at Information, which would bury our
 own messages once downloads and checks are running. Remove the override
 temporarily when SQL needs inspecting.
+
+## D-023 — Cookies via exported file, not --cookies-from-browser
+**Date:** Step 6
+**Decision:** Support an optional `cookies.txt` (Netscape format) path in
+settings. Do **not** use `--cookies-from-browser`.
+**Verified:** With Brave on Windows, `--cookies-from-browser brave` fails both
+ways — "could not copy cookie database" while the browser is open, and "failed
+to decrypt with DPAPI" while closed. The second is App-Bound Encryption, which
+ties decryption to the browser binary; it is not a configuration problem.
+An exported cookies.txt works, because the export happens inside the browser.
+**Reason:** The user has YouTube Premium and wants fewer bot challenges.
+**Consequences:**
+- One setting: `CookieFilePath`, default null.
+- Default location `AppData/Roaming/Rasid/cookies.txt`.
+- The file is a **login credential**: never commit it, never log its contents,
+  never include it in diagnostics. Added to `.gitignore`.
+- Cookies expire. When they do, downloads silently degrade or fail, so the app
+  must detect a missing or rejected cookie file and say so (extends S-18).
+- Both `IChannelResolver` and `IDownloadService` need the flag, so building the
+  cookie arguments belongs in one shared place.
+
+---
+
+## D-024 — Format selection deferred to step 11
+**Date:** Step 6
+**Verified:** yt-dlp offers av01, vp9, and avc1 at each resolution. Video and
+audio are separate streams above 360p, so ffmpeg is required to merge.
+**Open question:** "best quality" (requirement #2) needs refining. At 4K,
+av01 is 477 MB vs vp9 740 MB — but AV1 may force Jellyfin to transcode on
+clients without hardware decode, trading disk space for server CPU.
+**Options for step 11:** `bestvideo+bestaudio` (picks AV1), prefer VP9 for
+compatibility, or cap at 1080p (~105 MB per video instead of ~477 MB).
+**Also noted:** audio formats carry a language tag (`[ar]` on this channel),
+which is the mechanism S-22 would use for dubbed-track selection in v2.

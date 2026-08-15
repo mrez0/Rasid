@@ -5,7 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Rasid.App.ViewModels;
+using Rasid.Core.Abstractions;
 using Rasid.Core.Data;
+using Rasid.Core.Services;
 using Serilog;
 using Serilog.Events;
 
@@ -35,6 +37,7 @@ public static class AppHost
         );
 
         builder.Services.AddTransient<MainViewModel>();
+        builder.Services.AddSingleton<IChannelResolver, YtDlpChannelResolver>();
 
         return builder.Build();
     }

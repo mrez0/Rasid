@@ -18,10 +18,14 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            MainViewModel viewModel = Program.Host.Services.GetRequiredService<MainViewModel>();
+
             desktop.MainWindow = new MainWindow
             {
-                DataContext = Program.Host.Services.GetRequiredService<MainViewModel>()
+                DataContext = viewModel
             };
+
+            _ = viewModel.LoadChannelsAsync();
         }
 
         base.OnFrameworkInitializationCompleted();

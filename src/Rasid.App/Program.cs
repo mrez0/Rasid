@@ -18,6 +18,18 @@ internal sealed class Program
         {
             Log.Information("Rasid starting. Data folder: {Folder}", AppPaths.DataFolder);
 
+            try
+            {
+                Log.Information("Applying migrations...");
+                AppHost.MigrateDatabaseAsync(Host).GetAwaiter().GetResult();
+                Log.Information("Migrations done. Database at {Path}", AppPaths.DatabaseFile);
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Migration failed");
+                throw;
+            }
+
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }
         catch (Exception e)

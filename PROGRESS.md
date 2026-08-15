@@ -17,12 +17,12 @@
   reflection bindings are worse.
 - [x] **3.** Database — EF Core, `RasidDbContext`, the Channel and Video
   entities, first migration, `IDbContextFactory` and why it is mandatory.
-- [ ] **4.** Hosting and DI — `Microsoft.Extensions.Hosting`, wiring Avalonia's
+- [x] **4.** Hosting and DI — `Microsoft.Extensions.Hosting`, wiring Avalonia's
   lifetime to the host, Serilog, first injected service.
 
 ## Part 2 — Channels
 
-- [ ] **5.** Channel list UI — `ObservableCollection`, `ItemsControl` vs
+- [x] **5.** Channel list UI — `ObservableCollection`, `ItemsControl` vs
   `ListBox`, `DataTemplate`, ViewModel-first views. Reads real rows.
 - [ ] **6.** Adding a channel — `IChannelResolver` running yt-dlp, async command
   with a busy state, validation and error display (S-01).

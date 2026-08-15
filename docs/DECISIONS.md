@@ -288,3 +288,18 @@ user runs at home to watch the library from any device.
   **Cost:** Two extra yt-dlp flags and a filename template. Nothing structural.
   **Note:** Watch-progress tracking is Jellyfin's job, not ours — this is why
   watched/unwatched stayed out of scope.
+
+## D-021 — Migrations applied at startup, blocking
+**Date:** Step 5
+**Decision:** `MigrateDatabaseAsync` runs in Main before Avalonia starts,
+called synchronously with GetAwaiter().GetResult().
+**Reason:** The schema must exist before any ViewModel queries it. Blocking
+is safe here because no UI thread exists yet. Data loading, by contrast, is
+fire-and-forget so the window appears immediately.
+
+## D-022 — EF Core logging reduced to Warning
+**Date:** Step 5
+**Decision:** `MinimumLevel.Override("Microsoft.EntityFrameworkCore", Warning)`.
+**Reason:** EF logs every SQL statement at Information, which would bury our
+own messages once downloads and checks are running. Remove the override
+temporarily when SQL needs inspecting.
